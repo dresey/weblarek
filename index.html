@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,43 +9,41 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 
-    <title>Vite + TS</title>
+    <title>Web-Ларёк</title>
   </head>
   <body class="page">
     <div class="page__wrapper">
       <header class="header">
         <div class="header__container">
-          <a class="header__logo" href="/">
+          <a class="header__logo" href="/" aria-label="Главная страница Web-Ларька">
             <img class="header__logo-image" src="./src/images/logo.svg" alt="Web-Larek! logo" />
           </a>
-          <button class="header__basket">
+          <button type="button" class="header__basket" aria-label="Открыть корзину" aria-haspopup="dialog">
             <span class="header__basket-counter">0</span>
           </button>
         </div>
       </header>
 
-      <main class="gallery"></main>
+      <main class="gallery" aria-label="Каталог товаров"></main>
     </div>
 
-    <div class="modal" id="modal-container">
+    <section class="modal" id="modal-container" role="dialog" aria-modal="true" aria-label="Окно магазина">
       <div class="modal__container">
-        <button class="modal__close" aria-label="закрыть"></button>
-        <div class="modal__content">
-
-        </div>
+        <button type="button" class="modal__close" aria-label="Закрыть окно"></button>
+        <div class="modal__content"></div>
       </div>
-    </div>
+    </section>
 
     <template id="success">
       <div class="order-success">
         <h2 class="order-success__title">Заказ оформлен</h2>
         <p class="order-success__description">Списано 0 синапсов</p>
-        <button class="button order-success__close">За новыми покупками!</button>
+        <button type="button" class="button order-success__close">За новыми покупками!</button>
       </div>
     </template>
 
     <template id="card-catalog">
-      <button class="gallery__item card">
+      <button type="button" class="gallery__item card">
         <span class="card__category card__category_soft">софт-скил</span>
         <h2 class="card__title">+1 час в сутках</h2>
         <img class="card__image" src="./src/images/Subtract.svg" alt="" />
@@ -54,18 +52,18 @@
     </template>
 
     <template id="card-preview">
-      <div class="card card_full">
+      <article class="card card_full">
         <img class="card__image" src="./src/images/Subtract.svg" alt="" />
         <div class="card__column">
           <span class="card__category card__category_other">другое</span>
           <h2 class="card__title">Бэкенд-антистресс</h2>
           <p class="card__text">Если планируете решать задачи в тренажёре, берите два.</p>
           <div class="card__row">
-            <button class="button card__button">В корзину</button>
+            <button type="button" class="button card__button">В корзину</button>
             <span class="card__price">1000 синапсов</span>
           </div>
         </div>
-      </div>
+      </article>
     </template>
 
     <template id="card-basket">
@@ -73,21 +71,19 @@
         <span class="basket__item-index">1</span>
         <span class="card__title">Фреймворк куки судьбы</span>
         <span class="card__price">2500 синапсов</span>
-        <button class="basket__item-delete card__button" aria-label="удалить"></button>
+        <button type="button" class="basket__item-delete card__button" aria-label="Удалить товар"></button>
       </li>
     </template>
 
     <template id="basket">
-      <div class="basket">
-        <h2 class="modal__title">Корзина</h2>
-        <ul class="basket__list">
-
-        </ul>
+      <section class="basket" aria-labelledby="basket-title">
+        <h2 class="modal__title" id="basket-title">Корзина</h2>
+        <ul class="basket__list"></ul>
         <div class="modal__actions">
-          <button class="button basket__button">Оформить</button>
+          <button type="button" class="button basket__button">Оформить</button>
           <span class="basket__price">0 синапсов</span>
         </div>
-      </div>
+      </section>
     </template>
 
     <template id="order">
@@ -102,12 +98,12 @@
           </div>
           <label class="order__field">
             <span class="form__label modal__title">Адрес доставки</span>
-            <input name="address" class="form__input" type="text" placeholder="Введите адрес" />
+            <input name="address" class="form__input" type="text" autocomplete="street-address" placeholder="Введите адрес" />
           </label>
         </div>
         <div class="modal__actions">
           <button type="submit" disabled class="button order__button">Далее</button>
-          <span class="form__errors"></span>
+          <span class="form__errors" aria-live="polite"></span>
         </div>
       </form>
     </template>
@@ -117,16 +113,16 @@
         <div class="order">
           <label class="order__field">
             <span class="form__label modal__title">Email</span>
-            <input name="email" class="form__input" type="text" placeholder="Введите Email" />
+            <input name="email" class="form__input" type="email" autocomplete="email" placeholder="Введите email" />
           </label>
           <label class="order__field">
             <span class="form__label modal__title">Телефон</span>
-            <input name="phone" class="form__input" type="text" placeholder="+7 (" />
+            <input name="phone" class="form__input" type="tel" autocomplete="tel" placeholder="+7 (" />
           </label>
         </div>
         <div class="modal__actions">
           <button type="submit" disabled class="button">Оплатить</button>
-          <span class="form__errors"></span>
+          <span class="form__errors" aria-live="polite"></span>
         </div>
       </form>
     </template>
