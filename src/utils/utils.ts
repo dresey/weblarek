@@ -2,54 +2,54 @@ export function pascalToKebab(value: string): string {
     return value.replace(/([a-z0–9])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
-export function isSelector(x: any): x is string {
-    return (typeof x === "string") && x.length > 1;
+export function isSelector(value: unknown): value is string {
+    return typeof value === 'string' && value.length > 1;
 }
 
-export function isEmpty(value: any): boolean {
+export function isEmpty(value: unknown): boolean {
     return value === null || value === undefined;
 }
 
-export type SelectorCollection<T> = string | NodeListOf<Element> | T[];
+export type SelectorCollection<T extends Element> = string | NodeListOf<T> | T[];
 
-export function ensureAllElements<T extends HTMLElement>(selectorElement: SelectorCollection<T>, context: HTMLElement = document as unknown as HTMLElement): T[] {
-    if (isSelector(selectorElement)) {
-        return Array.from(context.querySelectorAll(selectorElement)) as T[];
+export function ensureAllElements<T extends Element>(selector: SelectorCollection<T>, context: ParentNode = document): T[] {
+    if (isSelector(selector)) {
+        return Array.from(context.querySelectorAll<T>(selector));
     }
-    if (selectorElement instanceof NodeList) {
-        return Array.from(selectorElement) as T[];
+    if (selector instanceof NodeList) {
+        return Array.from(selector) as T[];
     }
-    if (Array.isArray(selectorElement)) {
-        return selectorElement;
+    if (Array.isArray(selector)) {
+        return selector;
     }
-    throw new Error(`Unknown selector element`);
+    throw new Error('Unknown selector element');
 }
 
-export type SelectorElement<T> = T | string;
+export type SelectorElement<T extends Element> = T | string;
 
-export function ensureElement<T extends HTMLElement>(selectorElement: SelectorElement<T>, context?: HTMLElement): T {
-    if (isSelector(selectorElement)) {
-        const elements = ensureAllElements<T>(selectorElement, context);
+export function ensureElement<T extends HTMLElement>(selector: SelectorElement<T>, context?: ParentNode): T {
+    if (isSelector(selector)) {
+        const elements = ensureAllElements<T>(selector, context);
         if (elements.length > 1) {
-            console.warn(`selector ${selectorElement} return more then one element`);
+            console.warn(`Selector ${selector} returned more than one element`);
         }
         if (elements.length === 0) {
-            throw new Error(`selector ${selectorElement} return nothing`);
+            throw new Error(`Selector ${selector} returned no elements`);
         }
         return elements.pop() as T;
     }
-    if (selectorElement instanceof HTMLElement) {
-        return selectorElement as T;
+    if (selector instanceof HTMLElement) {
+        return selector as T;
     }
     throw new Error('Unknown selector element');
 }
 
 export function cloneTemplate<T extends HTMLElement>(query: string | HTMLTemplateElement): T {
-    const template = ensureElement(query) as HTMLTemplateElement;
-    if (!template.content.firstElementChild) {
+    const templateElement = ensureElement<HTMLTemplateElement>(query);
+    if (!templateElement.content.firstElementChild) {
         throw new Error(`Template ${query} has no content`);
     }
-    return template.content.firstElementChild.cloneNode(true) as T;
+    return templateElement.content.firstElementChild.cloneNode(true) as T;
 }
 
 export function bem(block: string, element?: string, modifier?: string): { name: string, class: string } {
@@ -62,54 +62,49 @@ export function bem(block: string, element?: string, modifier?: string): { name:
     };
 }
 
-export function getObjectProperties(obj: object, filter?: (name: string, prop: PropertyDescriptor) => boolean): string[] {
+export function getObjectProperties(object: object, filter?: (name: string, descriptor: PropertyDescriptor) => boolean): string[] {
     return Object.entries(
         Object.getOwnPropertyDescriptors(
-            Object.getPrototypeOf(obj)
+            Object.getPrototypeOf(object)
         )
     )
-        .filter(([name, prop]: [string, PropertyDescriptor]) => filter ? filter(name, prop) : (name !== 'constructor'))
+        .filter(([name, descriptor]: [string, PropertyDescriptor]) => filter ? filter(name, descriptor) : name !== 'constructor')
         .map(([name,]) => name);
 }
 
-/**
- * Устанавливает dataset атрибуты элемента
- */
-export function setElementData<T extends Record<string, unknown> | object>(el: HTMLElement, data: T) {
+export function setElementData(dataElement: HTMLElement, data: Record<string, unknown>): void {
     for (const key in data) {
-        el.dataset[key] = String(data[key]);
+        dataElement.dataset[key] = String(data[key]);
     }
 }
 
-/**
- * Получает типизированные данные из dataset атрибутов элемента
- */
-export function getElementData<T extends Record<string, unknown>>(el: HTMLElement, scheme: Record<string, Function>): T {
+export type DatasetSchema<T extends Record<string, unknown>> = {
+    [Key in keyof T]: (value: string | undefined) => T[Key];
+};
+
+export function getElementData<T extends Record<string, unknown>>(dataElement: HTMLElement, schema: DatasetSchema<T>): T {
     const data: Partial<T> = {};
-    for (const key in el.dataset) {
-        data[key as keyof T] = scheme[key](el.dataset[key]);
+    for (const key in dataElement.dataset) {
+        const schemaKey = key as keyof T;
+        const convertValue = schema[schemaKey];
+        data[schemaKey] = convertValue(dataElement.dataset[key]);
     }
     return data as T;
 }
 
-/**
- * Проверка на простой объект
- */
-export function isPlainObject(obj: unknown): obj is object {
-    const prototype = Object.getPrototypeOf(obj);
+export function isPlainObject(value: unknown): value is Record<string, unknown> {
+    if (value === null || typeof value !== 'object') {
+        return false;
+    }
+    const prototype = Object.getPrototypeOf(value);
     return  prototype === Object.getPrototypeOf({}) ||
         prototype === null;
 }
 
-export function isBoolean(v: unknown): v is boolean {
-    return typeof v === 'boolean';
+export function isBoolean(value: unknown): value is boolean {
+    return typeof value === 'boolean';
 }
 
-/**
- * Фабрика DOM-элементов в простейшей реализации
- * здесь не учтено много факторов
- * в интернет можно найти более полные реализации
- */
 export function createElement<
     T extends HTMLElement
     >(
@@ -124,8 +119,7 @@ export function createElement<
             if (isPlainObject(value) && key === 'dataset') {
                 setElementData(element, value);
             } else {
-                // @ts-expect-error fix indexing later
-                element[key] = isBoolean(value) ? value : String(value);
+                Reflect.set(element, key, isBoolean(value) ? value : String(value));
             }
         }
     }

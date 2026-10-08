@@ -1,4 +1,4 @@
-export const apiProducts = {
+export const sampleCatalogResponse = {
     "total": 10,
     "items": [
         {
