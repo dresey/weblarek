@@ -13,18 +13,18 @@ export class ShoppingCart {
     addProduct(product: IStoreProduct): void {
         if (!this.containsProduct(product.id)) {
             this.products.push(product);
-            this.events.emit('cart:changed', { products: this.products });
+            this.events.emit('cart:changed');
         }
     }
 
     removeProduct(productId: string): void {
         this.products = this.products.filter((product) => product.id !== productId);
-        this.events.emit('cart:changed', { products: this.products });
+        this.events.emit('cart:changed');
     }
 
     clearProducts(): void {
         this.products = [];
-        this.events.emit('cart:changed', { products: this.products });
+        this.events.emit('cart:changed');
     }
 
     getTotalPrice(): number {

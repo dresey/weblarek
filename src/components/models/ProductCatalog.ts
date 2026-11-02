@@ -9,7 +9,7 @@ export class ProductCatalog {
 
     replaceProducts(products: IStoreProduct[]): void {
         this.products = [...products];
-        this.events.emit('catalog:changed', { products: this.products });
+        this.events.emit('catalog:changed');
     }
 
     getProducts(): IStoreProduct[] {
@@ -22,7 +22,7 @@ export class ProductCatalog {
 
     setActiveProduct(product: IStoreProduct): void {
         this.activeProduct = product;
-        this.events.emit('product:selected', { product: this.activeProduct });
+        this.events.emit('product:selected');
     }
 
     getActiveProduct(): IStoreProduct | null {

@@ -1,4 +1,4 @@
-import type { ApiPostMethod } from '../../types';
+type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
 
 export class Api {
     readonly baseUrl: string;
@@ -27,11 +27,11 @@ export class Api {
         }).then(this.handleResponse<T>);
     }
 
-    post<T extends object>(endpoint: string, payload: object, method: ApiPostMethod = 'POST') {
-        return fetch(this.baseUrl + endpoint, {
+    post<T extends object>(uri: string, data: object, method: ApiPostMethods = 'POST') {
+        return fetch(this.baseUrl + uri, {
             ...this.options,
             method,
-            body: JSON.stringify(payload)
+            body: JSON.stringify(data)
         }).then(this.handleResponse<T>);
     }
 }

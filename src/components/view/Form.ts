@@ -1,5 +1,6 @@
 import { Component } from '../base/Component';
 import type { IEvents } from '../base/Events';
+import { ensureElement } from '../../utils/utils';
 
 interface IForm {
     valid: boolean;
@@ -9,30 +10,28 @@ interface IForm {
 export abstract class Form<T> extends Component<IForm> {
     protected submitButton: HTMLButtonElement;
     protected errorsElement: HTMLElement;
-    protected formElement: HTMLFormElement;
 
-    constructor(container: HTMLElement, protected events: IEvents) {
+    constructor(protected container: HTMLFormElement, protected events: IEvents) {
         super(container);
 
-        this.formElement = container as HTMLFormElement;
-        this.submitButton = container.querySelector('button[type=submit]') as HTMLButtonElement;
-        this.errorsElement = container.querySelector('.form__errors') as HTMLElement;
+        this.submitButton = ensureElement<HTMLButtonElement>('button[type=submit]', container);
+        this.errorsElement = ensureElement<HTMLElement>('.form__errors', container);
 
-        this.formElement.addEventListener('input', (event: Event) => {
-            const target = event.target as HTMLInputElement;
-            const field = target.name as keyof T;
-            const value = target.value;
+        this.container.addEventListener('input', (event: Event) => {
+            if (!(event.target instanceof HTMLInputElement)) return;
+            const field = event.target.name as keyof T;
+            const value = event.target.value;
             this.onInputChange(field, value);
         });
 
-        this.formElement.addEventListener('submit', (event: Event) => {
+        this.container.addEventListener('submit', (event: Event) => {
             event.preventDefault();
-            this.events.emit(`${this.formElement.name}:submit`);
+            this.events.emit(`${this.container.name}:submit`);
         });
     }
 
     protected onInputChange(field: keyof T, value: string): void {
-        this.events.emit(`${this.formElement.name}:change`, {
+        this.events.emit(`${this.container.name}:change`, {
             field,
             value
         });
@@ -47,7 +46,11 @@ export abstract class Form<T> extends Component<IForm> {
     }
 
     clear(): void {
-        this.formElement.reset();
+        this.container.reset();
+    }
+
+    getContainer(): HTMLElement {
+        return this.container;
     }
 
     render(state: Partial<T> & IForm): HTMLElement {

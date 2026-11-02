@@ -1,5 +1,6 @@
 import { Form } from './Form';
 import type { IEvents } from '../base/Events';
+import { ensureElement } from '../../utils/utils';
 
 interface IContactsForm {
     email: string;
@@ -7,21 +8,21 @@ interface IContactsForm {
 }
 
 export class ContactsForm extends Form<IContactsForm> {
-    constructor(container: HTMLElement, events: IEvents) {
+    protected emailElement: HTMLInputElement;
+    protected phoneElement: HTMLInputElement;
+
+    constructor(container: HTMLFormElement, events: IEvents) {
         super(container, events);
+
+        this.emailElement = ensureElement<HTMLInputElement>('[name="email"]', container);
+        this.phoneElement = ensureElement<HTMLInputElement>('[name="phone"]', container);
     }
 
     set email(value: string) {
-        const input = this.formElement.elements.namedItem('email') as HTMLInputElement;
-        if (input) {
-            input.value = value;
-        }
+        this.emailElement.value = value;
     }
 
     set phone(value: string) {
-        const input = this.formElement.elements.namedItem('phone') as HTMLInputElement;
-        if (input) {
-            input.value = value;
-        }
+        this.phoneElement.value = value;
     }
 }

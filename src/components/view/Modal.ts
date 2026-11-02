@@ -1,5 +1,6 @@
 import { Component } from '../base/Component';
 import type { IEvents } from '../base/Events';
+import { ensureElement } from '../../utils/utils';
 
 interface IModal {
     content: HTMLElement;
@@ -12,11 +13,11 @@ export class Modal extends Component<IModal> {
     constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
 
-        this.closeButton = container.querySelector('.modal__close') as HTMLButtonElement;
-        this.contentContainer = container.querySelector('.modal__content') as HTMLElement;
+        this.closeButton = ensureElement<HTMLButtonElement>('.modal__close', container);
+        this.contentContainer = ensureElement<HTMLElement>('.modal__content', container);
 
         this.closeButton.addEventListener('click', this.close.bind(this));
-        this.container.addEventListener('click', this.handleOverlayClick.bind(this));
+        container.addEventListener('click', this.handleOverlayClick.bind(this));
         this.contentContainer.addEventListener('click', (event) => event.stopPropagation());
     }
 
@@ -26,13 +27,11 @@ export class Modal extends Component<IModal> {
 
     open(): void {
         this.container.classList.add('modal_active');
-        this.events.emit('modal:opened');
     }
 
     close(): void {
         this.container.classList.remove('modal_active');
-        this.content = document.createElement('div');
-        this.events.emit('modal:closed');
+        this.contentContainer.replaceChildren();
     }
 
     protected handleOverlayClick(): void {

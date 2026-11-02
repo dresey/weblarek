@@ -15,7 +15,7 @@ export class CustomerData {
 
     updateDetails(changes: Partial<ICustomerDetails>): void {
         this.details = { ...this.details, ...changes };
-        this.events.emit('customer:changed', { customer: this.details, errors: this.getValidationErrors() });
+        this.events.emit('customer:changed');
     }
 
     getDetails(): ICustomerDetails {
@@ -24,7 +24,7 @@ export class CustomerData {
 
     clearDetails(): void {
         this.details = { ...EMPTY_CUSTOMER_DETAILS };
-        this.events.emit('customer:changed', { customer: this.details, errors: this.getValidationErrors() });
+        this.events.emit('customer:changed');
     }
 
     getValidationErrors(): TCustomerValidationErrors {
