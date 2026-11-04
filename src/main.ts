@@ -100,7 +100,7 @@ events.on('cart:changed', () => {
     const cards = products.map((product, index) => {
         const card = new CardBasket(
             cloneTemplate(basketCardTemplate),
-            () => cart.removeProduct(product.id)
+            () => events.emit('card:remove', { id: product.id })
         );
         return card.render({
             title: product.title,
@@ -162,6 +162,11 @@ events.on('card:action', () => {
         cart.addProduct(product);
     }
     modal.close();
+});
+
+// Удаление товара из корзины
+events.on('card:remove', ({ id }: { id: string }) => {
+    cart.removeProduct(id);
 });
 
 // Открытие корзины

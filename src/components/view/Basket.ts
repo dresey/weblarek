@@ -18,12 +18,9 @@ export class Basket extends Component<IBasket> {
         this.listElement = ensureElement<HTMLElement>('.basket__list', container);
         this.totalElement = ensureElement<HTMLElement>('.basket__price', container);
         this.buttonElement = ensureElement<HTMLButtonElement>('.basket__button', container);
-
-        if (this.buttonElement) {
-            this.buttonElement.addEventListener('click', () => {
-                this.events.emit('order:start');
-            });
-        }
+        this.buttonElement.addEventListener('click', () => {
+            this.events.emit('order:start');
+        });
     }
 
     set items(items: HTMLElement[]) {

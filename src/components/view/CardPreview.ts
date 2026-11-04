@@ -17,7 +17,7 @@ export class CardPreview extends Card<ICardPreview> {
     protected descriptionElement: HTMLElement;
     public buttonElement: HTMLButtonElement;
 
-    constructor(container: HTMLElement, events: IEvents) {
+    constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
 
         this.imageElement = ensureElement<HTMLImageElement>('.card__image', container);
@@ -26,7 +26,7 @@ export class CardPreview extends Card<ICardPreview> {
         this.buttonElement = ensureElement<HTMLButtonElement>('.card__button', container);
 
         this.buttonElement.addEventListener('click', () => {
-            events.emit('card:action');
+            this.events.emit('card:action');
         });
     }
 
@@ -53,9 +53,5 @@ export class CardPreview extends Card<ICardPreview> {
 
     set buttonDisabled(value: boolean) {
         this.buttonElement.disabled = value;
-    }
-
-    set price(value: number | null) {
-        this.priceElement.textContent = value === null ? 'Бесценно' : `${value} синапсов`;
     }
 }
